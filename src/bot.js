@@ -1,5 +1,6 @@
 require('dotenv').config()
 const tmi = require('tmi.js');
+const axios = require('axios');
 
 const botConfig = {
   identity: {
@@ -10,6 +11,8 @@ const botConfig = {
     process.env.CHANNEL_NAME_1
   ]
 };
+
+const backendUrl = "https://k301suduv8.execute-api.us-east-1.amazonaws.com/default/";
 
 const client = new tmi.client(botConfig);
 client.on('message', onMessageHandler);
@@ -27,9 +30,13 @@ function onMessageHandler(target, context, msg, self) {
   if (message.startsWith("oo")) {
     const command = message.substring(2).trim();
     switch(command) {
-      case "ping":
-        console.log(`Playing: ${command}-pong`)
+      case "tennis":
+        console.log(`Playing: ping-pong`);
         ping(command, target);
+        break;
+      case "join":
+        console.log(`${context.username} is joining a queue`);
+        join(command, target, context, message);
         break;
       default:
         console.log(`I dont know how to \"${command}\" yet... don't tease me!`)
@@ -37,8 +44,40 @@ function onMessageHandler(target, context, msg, self) {
   }
 }
 
-function ping(command, target) {
-  client.say(target, `pong`);
+var ping = async(command, target) => {
+  client.say(target, `tennis`);
+}
+
+var join = async(command, target, context, msg) => {
+  let channelName = target.substr(1);
+  let user = {
+    "id": context["user-id"],
+    "name": context.username,
+    "type": "twitch"
+  };
+  let queueEntry = await joinSession(user, channelName);
+  if (!queueEntry.err) {
+    client.say(target, `@${context["display-name"]} has joined the queue.`);
+  }
+}
+
+var joinSession = async (user, channelName) => {
+  try {
+    let request = {
+      "user": user,
+      "streamName": channelName
+    }
+    let response = await axios.post(backendUrl + "queue/entry", JSON.stringify(request));
+    return response.data.saved.Item;
+  }
+  catch (err) {
+    if (!err.response) {
+      console.log(err);
+      return({err: err});
+    }
+    console.log(err.response.data);
+    return({err: err.response.data});
+  }
 }
 
 function onConnectedHandler(addr, port) {
