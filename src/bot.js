@@ -7,9 +7,7 @@ const botConfig = {
     username: process.env.BOT_USERNAME,
     password: process.env.OAUTH_TOKEN
   },
-  channels: [
-    process.env.CHANNEL_NAME_1
-  ]
+  channels: JSON.parse(process.env.CHANNEL_NAMES)
 };
 
 const backendUrl = "https://k301suduv8.execute-api.us-east-1.amazonaws.com/default/";
