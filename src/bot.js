@@ -58,6 +58,7 @@ var join = async(command, target, context, msg) => {
     "type": "twitch"
   };
   let queueEntry = await joinSession(user, channelName);
+  if (!queueEntry) return "No response from server.";
   if (!queueEntry.err) {
     client.say(target, `@${context["display-name"]} has joined the queue.`);
   }
