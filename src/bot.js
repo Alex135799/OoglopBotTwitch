@@ -58,7 +58,6 @@ var join = async(command, target, context, msg) => {
     "type": "twitch"
   };
   let queueEntry = await joinSession(user, channelName);
-  if (!queueEntry) return "No response from server.";
   if (!queueEntry.err) {
     client.say(target, `@${context["display-name"]} has joined the queue.`);
   }
@@ -71,7 +70,7 @@ var joinSession = async (user, channelName) => {
       "streamName": channelName
     }
     let response = await axios.post(backendUrl + "queue/entry", JSON.stringify(request));
-    return response.data.saved.Item;
+    return response.data.saved;
   }
   catch (err) {
     if (!err.response) {
