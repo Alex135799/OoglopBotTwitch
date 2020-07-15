@@ -30,11 +30,15 @@ function onMessageHandler(target, context, msg, self) {
     switch(command) {
       case "tennis":
         console.log(`Playing: ping-pong`);
-        await ping(command, target);
+        ping(command, target).then(function(data) {
+          console.log(data)
+        });
         break;
       case "join":
         console.log(`${context.username} is joining a queue`);
-        await join(command, target, context, message);
+        join(command, target, context, message).then(function(data) {
+          console.log(data)
+        });
         break;
       default:
         console.log(`I dont know how to \"${command}\" yet... don't tease me!`)
